@@ -93,12 +93,17 @@ Wi-Fi chip inside it that would not load back.
 
 ## Known limitations
 
-- **Suspend fails roughly once in five attempts.** The machine enters suspend
-  cleanly and never returns; because nothing is written while suspended, there
-  is no trace in any log. Unresolved. If it happens to you, press Caps Lock
-  first: if the LED toggles, the kernel is alive and it is a graphics restore
-  problem; if not, the machine is truly gone. Then boot without `quiet splash`,
-  with `no_console_suspend=1 initcall_debug`, and photograph the screen.
+- **Suspend occasionally fails to come back.** Measured over a week of ordinary
+  use: **one hang in 26 logged sleeps**, on 22 September, with none since. The
+  machine enters suspend cleanly and never returns, and since nothing is written
+  to disk while it sleeps, there is no trace in any log. Unresolved.
+  You can count your own rate: the battery hook writes a `pre` line before every
+  sleep and a `post` line after it, so a hang is a `pre` with no matching `post`
+  in `/var/log/macbook-sleep-battery.log`.
+  If it happens to you, press Caps Lock first: if the LED toggles, the kernel is
+  alive and it is a graphics restore problem; if not, the machine is truly gone.
+  Then boot without `quiet splash`, with `no_console_suspend=1 initcall_debug`,
+  and photograph the screen.
 - **Root cause of fault B is unfixed.** The Broadcom calibration files
   (`brcmfmac4350c2-pcie.txt`, `clm_blob`, `txcap_blob`) are missing from the
   system and are the prime suspect for the firmware hangs. We work around it.
