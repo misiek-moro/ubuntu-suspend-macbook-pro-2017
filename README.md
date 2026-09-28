@@ -160,7 +160,48 @@ welcome — particularly from anyone with the same laptop whose machine behaves
 differently, and from anyone who knows what actually blocks S0ix here or where
 the missing Broadcom calibration files come from.
 
-## License
+## Prior art and credits
 
-MIT — see [LICENSE](LICENSE). Configuration files carry no warranty; this one
-changes how your machine sleeps, so read `install.sh --dry-run` output first.
+None of the individual fixes here are new. `pcie_port_pm=off`, unloading a
+misbehaving Wi-Fi driver around sleep, hibernating to a swap file with
+`resume=` and `resume_offset=`, and revoking wake sources through
+`/proc/acpi/wakeup` are all long-standing community knowledge — scattered
+across the kernel's own documentation, the Arch Wiki, Ask Ubuntu answers, bug
+reports and mailing-list threads written by people who worked this out years
+before us. The kernel documentation on
+[system sleep states](https://www.kernel.org/doc/html/latest/admin-guide/pm/sleep-states.html)
+is where most of it starts.
+
+Thanks are owed to those people, and to the maintainers of the `brcmfmac`
+driver and of the Linux power-management subsystem — their work is what makes
+any of this possible on a laptop whose manufacturer never intended it to run
+Linux at all.
+
+What this repository adds is narrower: the fixes are **measured** rather than
+asserted, the kernel command line is **bisected** from seven parameters down to
+the single one that actually matters, the **dead ends are written down**, and
+the whole configuration can be **verified with one command**. If that saves
+someone the two evenings it cost here, it has done its job.
+
+## License and attribution
+
+- **Code** — `install.sh`, `uninstall.sh`, `verify.sh`, `lib/files.sh` and the
+  scripts and configuration they install:
+  [MIT-0](https://spdx.org/licenses/MIT-0.html) (MIT No Attribution), see
+  [LICENSE](LICENSE).
+- **Writing** — this README and the write-up in `docs/`:
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), see
+  [LICENSE-DOCS](LICENSE-DOCS).
+
+In plain words:
+
+- **Take the code and do whatever you like with it.** Fork it, fix it, improve
+  it, ship your own better version, commercially or not. You do not owe anyone
+  a credit line. If someone makes this work properly, that is a good outcome.
+- **The write-up is the one thing that asks something in return.** If you
+  reproduce or describe this work itself — the faults and how they were found,
+  the measurements, the method — in an article, a blog post, a video or a wiki
+  page, credit **Michał Moroz** and link back here. That is all.
+- **Nothing here carries any warranty.** This configuration changes how a
+  machine sleeps and writes a hibernation image to disk; read the output of
+  `sudo ./install.sh --dry-run` before letting it touch anything.
