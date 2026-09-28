@@ -120,10 +120,10 @@
       <table>
         <thead><tr><th>Sytuacja</th><th>Zachowanie</th><th>Zużycie (zmierzone)</th></tr></thead>
         <tbody>
-          <tr><td><strong>Zamknięcie klapy</strong> na baterii</td><td>Uśpienie natychmiast, po 60 min automatyczna hibernacja</td><td class="num">6,3 %/h → 0,5 %/h</td></tr>
+          <tr><td><strong>Zamknięcie klapy</strong> na baterii</td><td>Uśpienie natychmiast, po 60 min automatyczna hibernacja</td><td class="num">ok. 4,3 %/h → 0,5 %/h</td></tr>
           <tr><td>Zamknięcie klapy na zasilaczu</td><td>Zwykłe uśpienie, bez hibernacji</td><td class="num">—</td></tr>
           <tr><td><strong>Komputer zostawiony sam sobie</strong>, klapa otwarta</td><td>Ekran gaśnie i blokuje się, maszyna <strong>pracuje dalej</strong> — świadoma decyzja, patrz niżej</td><td class="num">jak przy pracy</td></tr>
-          <tr><td><strong>Przycisk „Uśpij"</strong> w menu</td><td>Tylko uśpienie, bez przejścia w hibernację</td><td class="num">6–8 %/h bez końca</td></tr>
+          <tr><td><strong>Przycisk „Uśpij"</strong> w menu</td><td>Tylko uśpienie, bez przejścia w hibernację</td><td class="num">4–6 %/h bez końca</td></tr>
           <tr><td>Ekran po 5 min bezczynności</td><td>Gaśnie i blokuje się, komputer pracuje dalej</td><td class="num">—</td></tr>
           <tr><td>Powrót z uśpienia</td><td>Natychmiastowy, klawiszem lub gładzikiem</td><td class="num">—</td></tr>
           <tr><td>Powrót z hibernacji</td><td>Przyciskiem zasilania, ok. 30 s, sesja odtworzona</td><td class="num">—</td></tr>
@@ -138,6 +138,7 @@
       <p><strong>Pozostały koszt:</strong> po każdym wybudzeniu Wi-Fi łączy się od nowa (kilka sekund), a po hibernacji komputer włącza się przyciskiem zasilania, nie otwarciem klapy.</p>
     </div>
     <div class="note warn" style="margin-top:16px">
+      <p style="margin-bottom:10px"><strong>Skąd te liczby:</strong> sześć uśpień na baterii trwających od pół godziny do godziny, zmierzonych między 21 a 26 września — 3,79, 3,96, 4,11, 4,26, 6,02 i 6,07 %/h. Dwa dalsze odczyty pokazały równe zero i zostały odrzucone jako błąd licznika baterii, bo godzina uśpienia bez żadnej straty energii nie jest możliwa. Rachunek powtórzysz komendą <code>sleep-power</code>.</p>
       <p><strong>Uśpienie nie jest w stu procentach pewne.</strong> Zmierzone na tygodniu zwykłej pracy: <strong>jedno zawieszenie na 26 uśpień</strong>, 22 września, i ani jednego od tamtej pory. Maszyna nie wraca i trzeba ją wyłączyć przyciskiem zasilania, tracąc niezapisaną pracę. Przyczyna nie jest znana — szczegóły w sekcji „Czego nie wiemy". Przed dłuższą przerwą warto zapisać to, nad czym się pracuje.</p>
     </div>
   </section>
@@ -374,7 +375,7 @@ EOF</pre></div>
 
       <li><div>
         <h4>Komputer zostawiony sam sobie przy otwartej klapie</h4>
-        <p>Domyślnie usypia go GNOME po piętnastu minutach — zwykłym uśpieniem, które nigdy nie przechodzi w hibernację, więc bateria schodzi po 6–8 % na godzinę aż do zera. Pierwsza wersja tej konfiguracji oddawała tę decyzję <code>logind</code>, żeby bezczynność działała jak zamknięcie klapy. Zostało to <strong>wycofane po awarii</strong>: uśpienie wywołane bezczynnością zawiesiło maszynę, a tego samego dnia cztery uśpienia z klapy przeszły bez zarzutu. Wniosek jest taki, że usypiać ma wyłącznie klapa — świadomie, ręcznie, jednym gestem.</p>
+        <p>Domyślnie usypia go GNOME po piętnastu minutach — zwykłym uśpieniem, które nigdy nie przechodzi w hibernację, więc bateria schodzi po 4–6 % na godzinę aż do zera. Pierwsza wersja tej konfiguracji oddawała tę decyzję <code>logind</code>, żeby bezczynność działała jak zamknięcie klapy. Zostało to <strong>wycofane po awarii</strong>: uśpienie wywołane bezczynnością zawiesiło maszynę, a tego samego dnia cztery uśpienia z klapy przeszły bez zarzutu. Wniosek jest taki, że usypiać ma wyłącznie klapa — świadomie, ręcznie, jednym gestem.</p>
         <p>Dlatego bezczynność nie robi tu nic poza wygaszeniem i zablokowaniem ekranu. GNOME oddaje decyzję, a <code>logind</code> jej nie przejmuje.</p>
         <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo mkdir -p /etc/dconf/db/local.d/locks
 [ -f /etc/dconf/profile/user ] || printf 'user-db:user\nsystem-db:local\n' | sudo tee /etc/dconf/profile/user &gt;/dev/null

@@ -10,8 +10,8 @@ other. With all five fixed, a night off the charger now costs about **10 %**.
 
 | | |
 |---|---|
-| Measured suspend drain | ~6.3 %/h |
-| Measured hibernation drain | ~0.5 %/h |
+| Measured suspend drain | 3.8–6.1 %/h (mean 4.3, six measurements) |
+| Measured hibernation drain | ~0.5 %/h (overnight) |
 | Night (8–9 h, lid closed, battery) | ~10 %, was 78 % |
 | Resume from suspend | immediate |
 | Resume from hibernation | ~30 s, session restored |
@@ -31,7 +31,7 @@ unless you pass `--force`.
 |---|---|---|---|
 | **A** | Disk gone after resume; filesystem remounts read-only | PCIe ports enter D3cold and never come back | `pcie_port_pm=off` |
 | **B** | Machine does not suspend at all; wakes every ~30 s | BCM4350 firmware stops answering the D3 request after hours of uptime | unload the Wi-Fi driver before every sleep |
-| **C** | Suspend costs 6–8 %/h forever | the platform never reaches S0ix, so s2idle saves little | hibernate after an hour of suspend |
+| **C** | Suspend costs 4–6 %/h forever | the platform never reaches S0ix, so s2idle saves little | hibernate after an hour of suspend |
 | **D** | Machine powers itself on minutes after hibernating | Apple firmware lets the lid sensor and the Wi-Fi card wake it from S4 | revoke both, at boot **and** after every driver reload |
 | **E** | Wi-Fi interface missing after a warm reboot | the chip is not power-cycled and reads back `0xffffffff` | re-enumerate the PCI device 25 s after boot |
 
