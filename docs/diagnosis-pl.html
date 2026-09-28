@@ -1,0 +1,763 @@
+<title>Uśpienie i hibernacja MacBooka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground:#F5F4F0; --surface:#FFFFFF; --sunken:#ECEAE4;
+    --ink:#18222B; --muted:#5E6C79; --line:#D9D6CE;
+    --accent:#0D6B58; --accent-soft:#E1EFEA;
+    --warn:#9A5316; --warn-soft:#F6EADC;
+    --danger:#97302E; --danger-soft:#F5E3E1;
+    --code-bg:#1C242B; --code-ink:#DDE4E9; --code-line:#2E3941;
+    --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+    --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#10151A; --surface:#182027; --sunken:#1E272E;
+      --ink:#E4E9ED; --muted:#94A2AD; --line:#2B353D;
+      --accent:#4FBCA0; --accent-soft:#14312B;
+      --warn:#D9924F; --warn-soft:#332415;
+      --danger:#D97470; --danger-soft:#33201F;
+      --code-bg:#0C1116; --code-ink:#D6DEE4; --code-line:#232E36;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#10151A; --surface:#182027; --sunken:#1E272E;
+    --ink:#E4E9ED; --muted:#94A2AD; --line:#2B353D;
+    --accent:#4FBCA0; --accent-soft:#14312B;
+    --warn:#D9924F; --warn-soft:#332415;
+    --danger:#D97470; --danger-soft:#33201F;
+    --code-bg:#0C1116; --code-ink:#D6DEE4; --code-line:#232E36;
+  }
+  * { box-sizing: border-box; }
+  body { background:var(--ground); color:var(--ink); font-family:var(--f-body); font-size:17px; line-height:1.62; margin:0; }
+  .sheet { max-width:820px; margin:0 auto; padding-inline:20px; padding-block:48px 72px; }
+  h1,h2,h3,h4,.eyebrow,.tag,.btn,th,.meta-k,.big-k { font-family:var(--f-display); }
+  .eyebrow { font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); margin:0 0 12px; }
+  h1 { font-size:clamp(30px,6vw,42px); font-weight:700; letter-spacing:-0.02em; line-height:1.1; text-wrap:balance; margin:0 0 16px; }
+  .deck { font-size:19px; color:var(--muted); margin:0 0 28px; max-width:62ch; }
+  .meta { display:flex; flex-wrap:wrap; gap:12px 28px; padding-block:18px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin-bottom:44px; }
+  .meta div { display:flex; flex-direction:column; gap:2px; }
+  .meta-k { font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .meta-v { font-size:15px; font-variant-numeric:tabular-nums; }
+  h2 { font-size:13px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin:0 0 20px; padding-bottom:8px; border-bottom:1px solid var(--line); }
+  section { margin-bottom:56px; }
+  h3 { font-size:20px; font-weight:600; letter-spacing:-0.01em; margin:0 0 8px; }
+  h4 { font-size:15px; font-weight:600; margin:0 0 6px; }
+  p { margin:0 0 16px; }
+  p:last-child { margin-bottom:0; }
+  code { font-family:var(--f-mono); font-size:0.86em; background:var(--sunken); padding:1px 5px; border-radius:3px; word-break:break-word; }
+  .cmd { position:relative; margin:16px 0; background:var(--code-bg); border-radius:6px; overflow:hidden; }
+  .cmd pre { margin:0; padding:16px 18px; overflow-x:auto; color:var(--code-ink); font-family:var(--f-mono); font-size:12.5px; line-height:1.65; tab-size:2; }
+  .cmd .btn { position:absolute; top:8px; right:8px; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--code-ink); background:var(--code-line); border:0; border-radius:4px; padding:5px 9px; cursor:pointer; opacity:0.75; }
+  .cmd .btn:hover { opacity:1; }
+  .cmd .btn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .note { border-left:3px solid var(--accent); background:var(--accent-soft); padding:16px 18px; border-radius:0 6px 6px 0; font-size:16px; }
+  .note.warn { border-left-color:var(--warn); background:var(--warn-soft); }
+  table { width:100%; border-collapse:collapse; font-size:15px; }
+  th { text-align:left; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); font-weight:600; padding:0 12px 10px 0; border-bottom:1px solid var(--line); }
+  td { padding:11px 12px 11px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+  td.num { font-variant-numeric:tabular-nums; white-space:nowrap; }
+  td.path { font-family:var(--f-mono); font-size:12.5px; word-break:break-all; }
+  .ok { color:var(--accent); font-weight:600; }
+  .scroll { overflow-x:auto; }
+  .fix { background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:22px 24px; margin-bottom:18px; }
+  .fix-head { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+  .fix-id { font-family:var(--f-display); font-size:13px; font-weight:700; color:var(--surface); background:var(--accent); border-radius:4px; padding:3px 9px; letter-spacing:0.04em; }
+  .rows { display:grid; grid-template-columns:auto 1fr; gap:8px 16px; font-size:16px; align-items:baseline; }
+  .rows dt { font-family:var(--f-display); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); font-weight:600; white-space:nowrap; }
+  .rows dd { margin:0; }
+  @media (max-width:560px) { .rows { grid-template-columns:1fr; gap:2px 0; } .rows dd { margin-bottom:10px; } }
+  ol.steps { list-style:none; margin:0; padding:0; counter-reset:s; }
+  ol.steps > li { display:grid; grid-template-columns:28px 1fr; gap:14px; padding-block:18px; border-bottom:1px solid var(--line); }
+  ol.steps > li:last-child { border-bottom:0; }
+  ol.steps > li::before { counter-increment:s; content:counter(s); font-family:var(--f-display); font-size:13px; font-weight:700; color:var(--accent); line-height:1.9; font-variant-numeric:tabular-nums; }
+  ol.steps > li > div > :first-child { margin-top:0; }
+  ul.plain { margin:12px 0 0; padding-left:20px; }
+  ul.plain li { margin-bottom:8px; }
+  ul.plain li:last-child { margin-bottom:0; }
+  footer { margin-top:56px; padding-top:20px; border-top:1px solid var(--line); font-size:14px; color:var(--muted); }
+  ol.toc { list-style:none; margin:0; padding:0; counter-reset:t; }
+  ol.toc li { counter-increment:t; border-bottom:1px solid var(--line); }
+  ol.toc li:last-child { border-bottom:0; }
+  ol.toc a { display:grid; grid-template-columns:28px 1fr; gap:14px; align-items:baseline; padding-block:12px; text-decoration:none; color:var(--ink); }
+  ol.toc a::before { content:counter(t); font-family:var(--f-display); font-size:13px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
+  ol.toc a:hover .toc-t { color:var(--accent); }
+  .toc-t { font-family:var(--f-display); font-size:16px; font-weight:600; }
+  .toc-d { display:block; font-size:15px; color:var(--muted); }
+  html { scroll-behavior:smooth; }
+  :target { scroll-margin-top:24px; }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+</style>
+
+<div class="sheet">
+
+  <p class="eyebrow">Kompletna konfiguracja · MacBookPro14,1 · Ubuntu 24.04</p>
+  <h1>Uśpienie i hibernacja MacBooka</h1>
+  <p class="deck">Pięć niezależnych usterek, pięć poprawek. Uśpienie działa dla krótkich przerw, po godzinie komputer sam przechodzi w hibernację, a noc kosztuje około dziesięciu procent baterii zamiast siedemdziesięciu ośmiu.</p>
+
+  <div class="meta">
+    <div><span class="meta-k">Sprzęt</span><span class="meta-v">MacBook Pro 13" 2017</span></div>
+    <div><span class="meta-k">Jądro</span><span class="meta-v">6.8.0-139-generic</span></div>
+    <div><span class="meta-k">Dysk</span><span class="meta-v">APPLE SSD AP0512J</span></div>
+    <div><span class="meta-k">Wi-Fi</span><span class="meta-v">Broadcom BCM4350</span></div>
+  </div>
+
+  <section id="o-projekcie">
+    <h2>O co w tym chodzi</h2>
+    <p>MacBook Pro 13" z 2017 roku z Ubuntu 24.04 nie potrafił zasnąć. Zamknięcie klapy kończyło się na jeden z dwóch sposobów: albo komputer budził się z martwym dyskiem i trzeba go było wyłączać przyciskiem, albo w ogóle nie zasypiał i chodził dalej z zamkniętą klapą. Zostawiony na noc bez zasilacza tracił <strong>78 % baterii</strong>. W praktyce oznaczało to wyłączanie komputera po każdej pracy i uruchamianie go od zera.</p>
+    <p>Przyczyna nie była jedna. Diagnostyka pokazała <strong>pięć niezależnych usterek</strong>, które nakładały się na siebie i maskowały nawzajem: zasilanie portów PCIe zabijające dysk, zawieszone firmware karty Wi-Fi blokujące całą operację, brak wsparcia dla oszczędnego stanu platformy, firmware Apple samo włączające komputer po hibernacji i karta Wi-Fi znikająca po ciepłym restarcie. Każdą trzeba było znaleźć i naprawić osobno.</p>
+    <p>Ten dokument jest kompletnym zapisem tej pracy i zarazem instrukcją odtworzenia. Zawiera opis każdej usterki wraz z mechanizmem, instalację od zera na czystym systemie, komendę sprawdzającą całość, procedurę diagnostyczną na wypadek nawrotu, pełne wycofanie zmian oraz listę rzeczy sprawdzonych i odrzuconych — żeby nikt nie musiał ich sprawdzać drugi raz. Konfiguracja nie zostawia niczego w katalogu domowym i jest odporna na aktualizacje systemu.</p>
+    <p class="note" style="margin-top:18px">Wszystkie parametry zostały <strong>wybisekcjonowane</strong>: z siedmiu parametrów jądra, od których zaczynaliśmy, po kolejnych testach został jeden, który naprawdę robi robotę. Reszta jest w sekcji „Sprawdzone i odrzucone”.</p>
+  </section>
+
+  <section id="co-daje">
+    <h2>Jak to działa po zmianach</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Sytuacja</th><th>Zachowanie</th><th>Zużycie (zmierzone)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Zamknięcie klapy</strong> na baterii</td><td>Uśpienie natychmiast, po 60 min automatyczna hibernacja</td><td class="num">6,3 %/h → 0,5 %/h</td></tr>
+          <tr><td>Zamknięcie klapy na zasilaczu</td><td>Zwykłe uśpienie, bez hibernacji</td><td class="num">—</td></tr>
+          <tr><td><strong>Komputer zostawiony sam sobie</strong>, klapa otwarta</td><td>Ekran gaśnie i blokuje się, maszyna <strong>pracuje dalej</strong> — świadoma decyzja, patrz niżej</td><td class="num">jak przy pracy</td></tr>
+          <tr><td><strong>Przycisk „Uśpij"</strong> w menu</td><td>Tylko uśpienie, bez przejścia w hibernację</td><td class="num">6–8 %/h bez końca</td></tr>
+          <tr><td>Ekran po 5 min bezczynności</td><td>Gaśnie i blokuje się, komputer pracuje dalej</td><td class="num">—</td></tr>
+          <tr><td>Powrót z uśpienia</td><td>Natychmiastowy, klawiszem lub gładzikiem</td><td class="num">—</td></tr>
+          <tr><td>Powrót z hibernacji</td><td>Przyciskiem zasilania, ok. 30 s, sesja odtworzona</td><td class="num">—</td></tr>
+          <tr><td>Noc bez zasilacza (8–9 h)</td><td>Godzina uśpienia, reszta hibernacja</td><td class="num"><span class="ok">ok. 10%</span> zamiast 78%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note warn" style="margin-top:20px">
+      <p><strong>Wszystko uruchamia klapa — nie przycisk i nie bezczynność.</strong> „Uśpij" w menu GNOME rozmawia z systemem inną drogą, która nie zna hibernacji: usypia i na tym poprzestaje. Bezczynność została celowo pozbawiona prawa usypiania. Na każdą dłuższą przerwę i na noc: zamknij klapę.</p>
+    </div>
+    <div class="note" style="margin-top:16px">
+      <p><strong>Pozostały koszt:</strong> po każdym wybudzeniu Wi-Fi łączy się od nowa (kilka sekund), a po hibernacji komputer włącza się przyciskiem zasilania, nie otwarciem klapy.</p>
+    </div>
+    <div class="note warn" style="margin-top:16px">
+      <p><strong>Uśpienie nie jest w stu procentach pewne.</strong> Mniej więcej raz na pięć razy maszyna nie wraca i trzeba ją wyłączyć przyciskiem zasilania, tracąc niezapisaną pracę. Przyczyna nie jest znana — szczegóły i sposób jej złapania w sekcji „Czego nie wiemy". Przed dłuższą przerwą warto zapisać to, nad czym się pracuje.</p>
+    </div>
+  </section>
+
+  <section id="spis">
+    <h2>Spis treści</h2>
+    <ol class="toc">
+      <li><a href="#usterki"><span><span class="toc-t">Pięć usterek i ich naprawy</span><span class="toc-d">Objaw, wpis w logu, mechanizm i poprawka — osobno dla każdej z pięciu</span></span></a></li>
+      <li><a href="#pliki"><span><span class="toc-t">Gdzie co leży</span><span class="toc-d">Mapa wszystkich plików konfiguracji i skryptów</span></span></a></li>
+      <li><a href="#instalacja"><span><span class="toc-t">Instalacja od zera</span><span class="toc-d">Jedenaście kroków odtwarzających całość na czystym systemie</span></span></a></li>
+      <li><a href="#weryfikacja"><span><span class="toc-t">Weryfikacja</span><span class="toc-d">Komenda <code>sleep-check</code> plus testy uśpienia, bezczynności i hibernacji</span></span></a></li>
+      <li><a href="#utrzymanie"><span><span class="toc-t">Utrzymanie po aktualizacjach</span><span class="toc-d">Co sprawdzić po aktualizacji jądra i co zrobić, gdy coś wypadnie</span></span></a></li>
+      <li><a href="#diagnostyka"><span><span class="toc-t">Diagnostyka przy nawrocie</span><span class="toc-d">Skrypt <code>sleep-probe</code> i sposób czytania jego wyniku</span></span></a></li>
+      <li><a href="#wycofanie"><span><span class="toc-t">Wycofanie</span><span class="toc-d">Usunięcie wszystkich zmian i powrót do stanu wyjściowego</span></span></a></li>
+      <li><a href="#odrzucone"><span><span class="toc-t">Sprawdzone i odrzucone</span><span class="toc-d">Parametry i tropy, które nic nie dały — żeby nie sprawdzać ich drugi raz</span></span></a></li>
+      <li><a href="#niewiadome"><span><span class="toc-t">Czego nie wiemy</span><span class="toc-d">Granice tego rozwiązania i rzeczy niepotwierdzone</span></span></a></li>
+    </ol>
+  </section>
+
+  <section id="usterki">
+    <h2>Pięć usterek i ich naprawy</h2>
+
+    <div class="fix">
+      <div class="fix-head"><span class="fix-id">A</span><h3>Dysk nie wraca z uśpienia</h3></div>
+      <dl class="rows">
+        <dt>Objaw</dt><dd>Po wybudzeniu pulpit reaguje, ale żaden program się nie uruchamia, znika sieć, restart nie przechodzi.</dd>
+        <dt>W logu</dt><dd><code>nvme nvme0: Identify Controller failed (-4)</code>, dalej <code>Buffer I/O error</code> i <code>Remounting filesystem read-only</code>.</dd>
+        <dt>Mechanizm</dt><dd>Porty PCIe schodzą do stanu D3cold i nie wracają: <code>Unable to change power state from D3cold to D0</code>. Razem z portem odpada dysk.</dd>
+        <dt>Poprawka</dt><dd>Parametr jądra <code>pcie_port_pm=off</code>.</dd>
+      </dl>
+    </div>
+
+    <div class="fix">
+      <div class="fix-head"><span class="fix-id">B</span><h3>Maszyna w ogóle nie zasypia</h3></div>
+      <dl class="rows">
+        <dt>Objaw</dt><dd>Zamknięta klapa, laptop ciepły, bateria znika po kilkanaście procent na godzinę. Setki „uśpień" po 6–7 sekund w takcie co 31 sekund.</dd>
+        <dt>W logu</dt><dd><code>brcmf_pcie_pm_enter_D3: Timeout on response</code>, <code>PM: failed to suspend async: error -5</code>.</dd>
+        <dt>Mechanizm</dt><dd>Firmware karty Wi-Fi zawiesza się po kilku godzinach pracy i przestaje odpowiadać na prośbę o uśpienie. Jądro czeka 4,5 s i wycofuje całą operację. Kolejne 24 sekundy to <code>logind</code> czekający, zanim znów zareaguje na klapę — stąd regularny takt.</dd>
+        <dt>Poprawka</dt><dd>Skrypt <code>50-wifi-reset</code> wyjmujący sterownik przed każdym uśpieniem i wstawiający go po wybudzeniu.</dd>
+      </dl>
+    </div>
+
+    <div class="fix">
+      <div class="fix-head"><span class="fix-id">C</span><h3>Uśpienie zjada 5–7% baterii na godzinę</h3></div>
+      <dl class="rows">
+        <dt>Objaw</dt><dd>Uśpienie działa poprawnie, ale noc kosztuje ok. 78% naładowania.</dd>
+        <dt>Pomiar</dt><dd><code>/sys/kernel/debug/pmc_core/slp_s0_residency_usec</code> pokazuje <strong>0</strong> po jedenastu godzinach snu.</dd>
+        <dt>Mechanizm</dt><dd>Platforma nigdy nie wchodzi w głęboki spoczynek S0ix. Tryb <code>s2idle</code> sprowadza się wtedy do zgaszenia ekranu — pobór ok. 4 W.</dd>
+        <dt>Poprawka</dt><dd>Hibernacja jako tryb długich przerw, uruchamiana automatycznie po godzinie uśpienia.</dd>
+      </dl>
+    </div>
+
+    <div class="fix">
+      <div class="fix-head"><span class="fix-id">D</span><h3>Komputer sam się włącza z hibernacji</h3></div>
+      <dl class="rows">
+        <dt>Objaw</dt><dd>Hibernacja się udaje, komputer gaśnie — i po chwili sam się włącza. W logach systemu nie ma po tym śladu, bo system wtedy nie działał.</dd>
+        <dt>Mechanizm</dt><dd>Czujnik klapy (<code>LID0</code>) ma w firmware prawo włączania komputera ze stanu S4 i zgłasza fałszywe zdarzenia. Karta Wi-Fi (<code>ARPT</code>) ma to samo uprawnienie.</dd>
+        <dt>Poprawka</dt><dd>Usługa <code>disable-wake-sources</code> odbierająca obu urządzeniom to prawo przy każdym starcie — <strong>oraz</strong> wywołanie tej samej usługi przez skrypt Wi-Fi przy każdym uśpieniu i wybudzeniu.</dd>
+        <dt>Uwaga</dt><dd>To ustawienie żyje w pamięci jądra (<code>/proc/acpi/wakeup</code>), nie w żadnym pliku, i firmware Apple przywraca je przy każdym włączeniu komputera. Co gorsza, <strong>wraca też przy każdym przeładowaniu sterownika Wi-Fi</strong> — czyli przy każdym uśpieniu, bo tego wymaga poprawka B. Sam start systemu to za mało; bez wywołania ze skryptu poprawka D rozsypuje się po pierwszym uśpieniu.</dd>
+      </dl>
+    </div>
+
+    <div class="fix">
+      <div class="fix-head"><span class="fix-id">E</span><h3>Wi-Fi nie wstaje po restarcie</h3></div>
+      <dl class="rows">
+        <dt>Objaw</dt><dd>Po „ciepłym" restarcie karta bywa niewidoczna. Nieregularnie, mniej więcej co trzeci raz.</dd>
+        <dt>W logu</dt><dd><code>brcmf_chip_recognition: MMIO read failed: 0xffffffff</code>, <code>brcmf_pcie_probe: failed 14e4:43a3</code>.</dd>
+        <dt>Mechanizm</dt><dd>Restart bez odcięcia zasilania nie resetuje układu Broadcom; sterownik odczytuje same jedynki zamiast identyfikatora.</dd>
+        <dt>Poprawka</dt><dd>Zegar <code>wifi-recover</code> sprawdzający 25 s po starcie, czy karta jest — i wymuszający ponowne wykrycie, gdy jej brak.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section id="pliki">
+    <h2>Gdzie co leży</h2>
+    <p>Nazwy plików i skryptów są po angielsku, żeby konfiguracja nadawała się do opublikowania. Nic nie leży w katalogu domowym.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Ścieżka</th><th>Rola</th></tr></thead>
+        <tbody>
+          <tr><td class="path">/etc/default/grub.d/99-macbook-suspend.cfg</td><td>Parametry jądra: tryb uśpienia, zasilanie portów PCIe, wskazanie obrazu hibernacji</td></tr>
+          <tr><td class="path">/etc/initramfs-tools/conf.d/resume</td><td>Gdzie szukać obrazu hibernacji przy starcie</td></tr>
+          <tr><td class="path">/usr/lib/systemd/system-sleep/50-wifi-reset</td><td>Reset karty Wi-Fi przy każdym uśpieniu (usterka B)</td></tr>
+          <tr><td class="path">/usr/lib/systemd/system-sleep/99-battery-log</td><td>Zapis stanu baterii do pomiarów</td></tr>
+          <tr><td class="path">/etc/systemd/sleep.conf.d/99-hibernate.conf</td><td>Opóźnienie przejścia w hibernację</td></tr>
+          <tr><td class="path">/etc/systemd/logind.conf.d/99-lid.conf</td><td>Zachowanie przy zamknięciu klapy</td></tr>
+          <tr><td class="path">/etc/systemd/logind.conf.d/99-idle.conf</td><td>Zachowanie po dłuższej bezczynności przy otwartej klapie</td></tr>
+          <tr><td class="path">/etc/dconf/db/local.d/00-macbook-sleep</td><td>Systemowe ustawienie GNOME: bezczynność nie usypia</td></tr>
+          <tr><td class="path">/etc/dconf/db/local.d/locks/macbook-sleep</td><td>Kłódka na powyższym — nie da się go nadpisać z pulpitu</td></tr>
+          <tr><td class="path">/usr/local/sbin/disable-wake-sources</td><td>Odbiera klapie i Wi-Fi prawo włączania komputera (usterka D)</td></tr>
+          <tr><td class="path">/usr/local/sbin/wifi-recover</td><td>Przywraca kartę, gdy nie wstała po starcie (usterka E)</td></tr>
+          <tr><td class="path">/usr/local/sbin/sleep-check</td><td>Kontrola całej konfiguracji, jedna komenda</td></tr>
+          <tr><td class="path">/usr/local/sbin/sleep-probe</td><td>Diagnostyka przy nawrocie problemów</td></tr>
+          <tr><td class="path">/usr/local/bin/sleep-power</td><td>Raport zużycia baterii w uśpieniu</td></tr>
+          <tr><td class="path">/etc/apt/apt.conf.d/99-macbook-sleep-check</td><td>Automatyczna kontrola po każdej operacji na pakietach</td></tr>
+          <tr><td class="path">/var/log/macbook-sleep-wifi.log</td><td>Co robił skrypt Wi-Fi przy każdym uśpieniu</td></tr>
+          <tr><td class="path">/var/log/macbook-sleep-battery.log</td><td>Surowe pomiary energii</td></tr>
+          <tr><td class="path">/var/log/macbook-sleep-check.log</td><td>Wyniki kontroli zapisywane po aktualizacjach</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="instalacja">
+    <h2>Instalacja od zera</h2>
+    <p>Kolejność ma znaczenie: plik wymiany musi istnieć, zanim policzymy jego położenie na dysku.</p>
+
+    <ol class="steps">
+      <li><div>
+        <h4>Plik wymiany na rozmiar pamięci</h4>
+        <p>Hibernacja zapisuje całą pamięć na dysk. Przy 15 GB RAM dajemy 20 GB zapasu.</p>
+        <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo swapoff /swap.img
+sudo rm -f /swap.img
+sudo fallocate -l 20G /swap.img
+sudo chmod 600 /swap.img
+sudo mkswap /swap.img
+sudo swapon /swap.img
+swapon --show</pre></div>
+      </div></li>
+
+      <li><div>
+        <h4>Parametry jądra i wskazanie obrazu hibernacji</h4>
+        <p>Wszystko w osobnym pliku, żeby wycofanie było skasowaniem jednego pliku. Położenie pliku wymiany wyliczane automatycznie.</p>
+        <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>ROOT_UUID=$(findmnt -no UUID /)
+OFFSET=$(sudo filefrag -v /swap.img | awk '$1=="0:"{print $4}' | tr -d '.')
+
+sudo tee /etc/initramfs-tools/conf.d/resume &gt;/dev/null &lt;&lt;EOF
+RESUME=UUID=$ROOT_UUID
+EOF
+
+sudo tee /etc/default/grub.d/99-macbook-suspend.cfg &gt;/dev/null &lt;&lt;EOF
+GRUB_CMDLINE_LINUX_DEFAULT="\$GRUB_CMDLINE_LINUX_DEFAULT mem_sleep_default=s2idle pcie_port_pm=off resume=UUID=$ROOT_UUID resume_offset=$OFFSET"
+EOF
+
+sudo update-initramfs -u -k all
+sudo update-grub</pre></div>
+        <p class="note warn" style="margin-top:14px">Ostrzeżenie <code>no matching swap device is available</code> przy budowaniu obrazu startowego jest normalne przy pliku wymiany i można je zignorować.</p>
+      </div></li>
+
+      <li><div>
+        <h4>Reset karty Wi-Fi przy każdym uśpieniu</h4>
+        <p class="note warn"><strong>Ścieżka jest tu jedyna i nie ma wariantu w <code>/etc</code>.</strong> Większość ustawień systemd da się nadpisać plikiem w <code>/etc/systemd/</code>, ale skrypty usypiania są wyjątkiem: <code>systemd-sleep</code> ma wkompilowany dokładnie jeden katalog, <code>/usr/lib/systemd/system-sleep</code>. Plik położony w <code>/etc/systemd/system-sleep/</code> nie zostanie uruchomiony nigdy — bez błędu, bez wpisu w dzienniku, bez żadnego znaku. Sprawdzenie wprost: <code>strings /usr/lib/systemd/systemd-sleep | grep system-sleep</code>. Kosztowało nas to jedną nieudaną hibernację, bo poprawka B po cichu przestała działać.</p>
+        <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo mkdir -p /usr/lib/systemd/system-sleep
+sudo tee /usr/lib/systemd/system-sleep/50-wifi-reset &gt;/dev/null &lt;&lt;'EOF'
+#!/bin/sh
+# Broadcom BCM4350 firmware hangs after some hours of uptime and stops
+# answering the D3 request, which aborts every suspend. Unload the driver
+# before sleep, load it back on resume, force a PCI rescan if it is missing.
+LOG=/var/log/macbook-sleep-wifi.log
+IFACE=wlp2s0
+PCI=0000:02:00.0
+stamp() { date '+%F %T'; }
+# Re-binding the driver re-arms ARPT as a wake source, which lets the card
+# power the machine on from hibernation. Re-apply the wake policy every time.
+wake_off() { [ -x /usr/local/sbin/disable-wake-sources ] &amp;&amp; /usr/local/sbin/disable-wake-sources &gt;/dev/null 2&gt;&amp;1; }
+case "$1" in
+  pre)
+    i=1
+    while [ $i -le 3 ]; do
+      if /usr/sbin/modprobe -r brcmfmac_wcc brcmfmac 2&gt;&gt;"$LOG"; then
+        wake_off
+        echo "$(stamp) pre: driver unloaded (attempt $i)" &gt;&gt; "$LOG"
+        exit 0
+      fi
+      sleep 2
+      i=$((i+1))
+    done
+    wake_off
+    echo "$(stamp) pre: FAILED to unload driver after 3 attempts" &gt;&gt; "$LOG"
+    ;;
+  post)
+    /usr/sbin/modprobe brcmfmac 2&gt;&gt;"$LOG"
+    sleep 3
+    if /usr/sbin/ip link show "$IFACE" &gt;/dev/null 2&gt;&amp;1; then
+      echo "$(stamp) post: driver loaded" &gt;&gt; "$LOG"
+    else
+      echo "$(stamp) post: interface missing, forcing PCI rescan" &gt;&gt; "$LOG"
+      /usr/sbin/modprobe -r brcmfmac_wcc brcmfmac 2&gt;&gt;"$LOG"
+      [ -e "/sys/bus/pci/devices/$PCI/remove" ] &amp;&amp; echo 1 &gt; "/sys/bus/pci/devices/$PCI/remove"
+      sleep 2
+      echo 1 &gt; /sys/bus/pci/rescan
+      sleep 3
+      /usr/sbin/modprobe brcmfmac 2&gt;&gt;"$LOG"
+      sleep 3
+      if /usr/sbin/ip link show "$IFACE" &gt;/dev/null 2&gt;&amp;1; then
+        echo "$(stamp) post: recovered by PCI rescan" &gt;&gt; "$LOG"
+      else
+        echo "$(stamp) post: RECOVERY FAILED" &gt;&gt; "$LOG"
+      fi
+    fi
+    wake_off
+    ;;
+esac
+EOF
+sudo chmod +x /usr/lib/systemd/system-sleep/50-wifi-reset</pre></div>
+      </div></li>
+
+      <li><div>
+        <h4>Logger zużycia baterii</h4>
+        <p>Nie jest częścią naprawy, ale bez niego nie da się sprawdzić, czy uśpienie faktycznie oszczędza prąd. Zasilacz na tym sprzęcie nazywa się <code>ADP1</code>, nie <code>AC</code> — częsta pomyłka, przez którą pole zostaje puste i pomiar traci sens.</p>
+        <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo tee /usr/lib/systemd/system-sleep/99-battery-log &gt;/dev/null &lt;&lt;'EOF'
+#!/bin/sh
+# Records charge level and energy before and after every sleep operation,
+# so power draw can be measured afterwards. AC adapter on this Mac is ADP1.
+B=/sys/class/power_supply/BAT0
+AC=$(cat /sys/class/power_supply/ADP1/online 2&gt;/dev/null || echo "?")
+echo "$(date '+%F %T') $1 $2 level=$(cat $B/capacity)% energy=$(cat $B/energy_now 2&gt;/dev/null || cat $B/charge_now 2&gt;/dev/null) ac=$AC" &gt;&gt; /var/log/macbook-sleep-battery.log
+EOF
+sudo chmod +x /usr/lib/systemd/system-sleep/99-battery-log</pre></div>
+      </div></li>
+
+      <li><div>
+        <h4>Tryb mieszany: uśpienie przechodzące w hibernację</h4>
+        <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo mkdir -p /etc/systemd/sleep.conf.d /etc/systemd/logind.conf.d
+
+sudo tee /etc/systemd/sleep.conf.d/99-hibernate.conf &gt;/dev/null &lt;&lt;'EOF'
+# Move from suspend to hibernation after one hour on battery.
+# s2idle never reaches S0ix on this machine and costs about 6 %/h,
+# hibernation costs about 0.5 %/h.
+[Sleep]
+HibernateDelaySec=60min
+EOF
+
+sudo tee /etc/systemd/logind.conf.d/99-lid.conf &gt;/dev/null &lt;&lt;'EOF'
+# Closing the lid on battery suspends first, then hibernates
+# after the delay set in 99-hibernate.conf.
+# On AC power plain suspend is enough.
+[Login]
+HandleLidSwitch=suspend-then-hibernate
+HandleLidSwitchExternalPower=suspend
+EOF</pre></div>
+        <p class="note warn" style="margin-top:14px">Zmiany wchodzą po <strong>restarcie systemu</strong>. Nie restartuj samej usługi <code>systemd-logind</code> — to kładzie sesję graficzną i zostawia użytkownika na konsoli tekstowej.</p>
+      </div></li>
+
+      <li><div>
+        <h4>Komputer zostawiony sam sobie przy otwartej klapie</h4>
+        <p>Domyślnie usypia go GNOME po piętnastu minutach — zwykłym uśpieniem, które nigdy nie przechodzi w hibernację, więc bateria schodzi po 6–8 % na godzinę aż do zera. Pierwsza wersja tej konfiguracji oddawała tę decyzję <code>logind</code>, żeby bezczynność działała jak zamknięcie klapy. Zostało to <strong>wycofane po awarii</strong>: uśpienie wywołane bezczynnością zawiesiło maszynę, a tego samego dnia cztery uśpienia z klapy przeszły bez zarzutu. Wniosek jest taki, że usypiać ma wyłącznie klapa — świadomie, ręcznie, jednym gestem.</p>
+        <p>Dlatego bezczynność nie robi tu nic poza wygaszeniem i zablokowaniem ekranu. GNOME oddaje decyzję, a <code>logind</code> jej nie przejmuje.</p>
+        <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo mkdir -p /etc/dconf/db/local.d/locks
+[ -f /etc/dconf/profile/user ] || printf 'user-db:user\nsystem-db:local\n' | sudo tee /etc/dconf/profile/user &gt;/dev/null
+
+sudo tee /etc/dconf/db/local.d/00-macbook-sleep &gt;/dev/null &lt;&lt;'EOF'
+# Idling must never suspend this machine (see 99-idle.conf).
+# Screen blanking and locking stay untouched; only sleeping is taken away.
+[org/gnome/settings-daemon/plugins/power]
+sleep-inactive-battery-type='nothing'
+sleep-inactive-ac-type='nothing'
+EOF
+
+sudo tee /etc/dconf/db/local.d/locks/macbook-sleep &gt;/dev/null &lt;&lt;'EOF'
+/org/gnome/settings-daemon/plugins/power/sleep-inactive-battery-type
+/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type
+EOF
+
+sudo dconf update
+
+sudo tee /etc/systemd/logind.conf.d/99-idle.conf &gt;/dev/null &lt;&lt;'EOF'
+# Idling must never put this machine to sleep: an idle-triggered suspend
+# hung it once, while lid-triggered suspends kept working. The screen still
+# blanks and locks through GNOME; only sleeping is taken away.
+[Login]
+IdleAction=ignore
+EOF</pre></div>
+        <p class="note" style="margin-top:14px">Ustawienie GNOME idzie przez <code>dconf</code>, a nie przez <code>gsettings</code>, celowo: <code>gsettings</code> zapisuje je w profilu użytkownika, skąd zniknie razem z profilem i nie obowiązuje nikogo innego. Plik w <code>/etc/dconf/db/local.d/</code> jest systemowy, a dopisanie klucza do katalogu <code>locks/</code> dodatkowo go <strong>zamyka na kłódkę</strong> — suwak w ustawieniach GNOME będzie wyszarzony i żaden pulpit go nie nadpisze. Sprawdzenie: <code>gsettings writable org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type</code> ma zwrócić <code>false</code>.</p>
+        <p class="note" style="margin-top:14px">Cena tej decyzji: laptop zostawiony na baterii z otwartą klapą pracuje dalej i rozładuje się jak przy normalnej pracy. Wychodząc, zamknij klapę.</p>
+        <p class="note warn" style="margin-top:14px">Plik <code>logind</code> wchodzi po restarcie systemu albo po <code>sudo systemctl reload systemd-logind</code> — <strong>przeładowanie</strong> jest bezpieczne, w odróżnieniu od restartu usługi, który kładzie sesję graficzną. Sprawdzenie: <code>busctl get-property org.freedesktop.login1 /org/freedesktop/login1 org.freedesktop.login1.Manager IdleAction</code> — oczekiwane <code>ignore</code>.</p>
+      </div></li>
+
+      <li><div>
+        <h4>Odebranie klapie i Wi-Fi prawa włączania komputera</h4>
+        <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo tee /usr/local/sbin/disable-wake-sources &gt;/dev/null &lt;&lt;'EOF'
+#!/bin/sh
+# Apple firmware lets the lid sensor (LID0) and the Wi-Fi card (ARPT) power the
+# machine on from S4. The lid reports spurious events, so the laptop wakes itself
+# minutes after hibernating, with no trace in any system log.
+# Writing a device name to /proc/acpi/wakeup TOGGLES it, so check state first.
+for dev in ARPT LID0; do
+  if grep -q "^$dev.*\*enabled" /proc/acpi/wakeup; then
+    echo "$dev" &gt; /proc/acpi/wakeup
+  fi
+done
+exit 0
+EOF
+sudo chmod +x /usr/local/sbin/disable-wake-sources
+
+sudo tee /etc/systemd/system/disable-wake-sources.service &gt;/dev/null &lt;&lt;'EOF'
+[Unit]
+Description=Revoke lid and Wi-Fi permission to wake the machine from hibernation
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/disable-wake-sources
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now disable-wake-sources.service</pre></div>
+        <p style="margin-top:12px;font-size:16px">Sprawdzenie stanu przed przełączeniem jest konieczne: zapis do <code>/proc/acpi/wakeup</code> działa jak przełącznik, więc bezwarunkowe wywołanie włączyłoby uprawnienie z powrotem. Skrypt kończy się jawnym <code>exit 0</code>, bo inaczej nieudane dopasowanie <code>grep</code> zgłaszałoby porażkę usługi.</p>
+      </div></li>
+
+      <li><div>
+        <h4>Siatka bezpieczeństwa dla Wi-Fi po starcie</h4>
+        <p>Zegar zamiast usługi startowej, żeby nie opóźniać uruchamiania systemu.</p>
+        <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo tee /usr/local/sbin/wifi-recover &gt;/dev/null &lt;&lt;'EOF'
+#!/bin/sh
+# A warm reboot does not power-cycle the Broadcom chip, so the driver sometimes
+# reads 0xffffffff instead of the chip id and the interface never appears.
+# Making the bus re-enumerate the device brings it back. Does nothing when the
+# interface is already there.
+IFACE=wlp2s0
+PCI=0000:02:00.0
+/usr/sbin/ip link show "$IFACE" &gt;/dev/null 2&gt;&amp;1 &amp;&amp; exit 0
+logger "wifi-recover: $IFACE missing, forcing PCI rescan"
+/usr/sbin/modprobe -r brcmfmac_wcc brcmfmac 2&gt;/dev/null
+[ -e "/sys/bus/pci/devices/$PCI/remove" ] &amp;&amp; echo 1 &gt; "/sys/bus/pci/devices/$PCI/remove"
+sleep 2
+echo 1 &gt; /sys/bus/pci/rescan
+sleep 3
+/usr/sbin/modprobe brcmfmac 2&gt;/dev/null
+sleep 3
+if /usr/sbin/ip link show "$IFACE" &gt;/dev/null 2&gt;&amp;1; then
+  logger "wifi-recover: $IFACE recovered"
+else
+  logger "wifi-recover: recovery failed"
+fi
+exit 0
+EOF
+sudo chmod +x /usr/local/sbin/wifi-recover
+
+sudo tee /etc/systemd/system/wifi-recover.service &gt;/dev/null &lt;&lt;'EOF'
+[Unit]
+Description=Bring back the Wi-Fi interface if it did not appear after boot
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/wifi-recover
+EOF
+
+sudo tee /etc/systemd/system/wifi-recover.timer &gt;/dev/null &lt;&lt;'EOF'
+[Unit]
+Description=Check the Wi-Fi interface 25 seconds after boot
+
+[Timer]
+OnBootSec=25s
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now wifi-recover.timer</pre></div>
+      </div></li>
+
+      <li><div>
+        <h4>Narzędzia: kontrola, pomiar, diagnostyka</h4>
+        <p>Trzy skrypty. <code>sleep-check</code> weryfikuje całą konfigurację jedną komendą, <code>sleep-power</code> liczy zużycie z zebranych pomiarów, <code>sleep-probe</code> służy do diagnozy, gdyby problemy wróciły.</p>
+        <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo tee /usr/local/sbin/sleep-check &gt;/dev/null &lt;&lt;'EOF'
+#!/bin/bash
+# Verifies every piece of the MacBook sleep/hibernate configuration.
+# Run it after kernel or systemd updates:  sudo sleep-check
+t() { if eval "$2" &gt;/dev/null 2&gt;&amp;1; then echo "  OK      $1"; else echo "  MISSING $1"; fi; }
+echo "=== MacBook sleep configuration ==="
+t "kernel parameter pcie_port_pm=off" 'grep -q pcie_port_pm=off /proc/cmdline'
+t "kernel parameter resume"           'grep -q resume=UUID /proc/cmdline'
+t "initramfs resume config"           '[ -f /etc/initramfs-tools/conf.d/resume ]'
+t "sleep mode s2idle"                 'grep -q "\[s2idle\]" /sys/power/mem_sleep'
+t "swap file at least 16 GB"          '[ $(swapon --show=SIZE --bytes --noheadings | head -1) -ge 17000000000 ]'
+t "resume_offset matches swap file"   '[ "$(grep -o "resume_offset=[0-9]*" /proc/cmdline | cut -d= -f2)" = "$(filefrag -v /swap.img | awk "\$1==\"0:\"{print \$4}" | tr -d .)" ]'
+t "wifi reset sleep hook"             '[ -x /usr/lib/systemd/system-sleep/50-wifi-reset ]'
+t "battery logging sleep hook"        '[ -x /usr/lib/systemd/system-sleep/99-battery-log ]'
+t "hibernate delay config"            '[ -f /etc/systemd/sleep.conf.d/99-hibernate.conf ]'
+t "lid set to suspend-then-hibernate" 'busctl get-property org.freedesktop.login1 /org/freedesktop/login1 org.freedesktop.login1.Manager HandleLidSwitch | grep -q suspend-then-hibernate'
+t "disable-wake-sources service"      'systemctl is-enabled disable-wake-sources.service'
+t "wifi-recover timer"                'systemctl is-enabled wifi-recover.timer'
+t "lid cannot wake from hibernation"  'grep -q "^LID0.*\*disabled" /proc/acpi/wakeup'
+t "wifi cannot wake from hibernation" 'grep -q "^ARPT.*\*disabled" /proc/acpi/wakeup'
+t "idle leaves the machine running"     'busctl get-property org.freedesktop.login1 /org/freedesktop/login1 org.freedesktop.login1.Manager IdleAction | grep -q ignore'
+t "GNOME never suspends on idle"        'sudo -u ${SUDO_USER:-$USER} DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u ${SUDO_USER:-$USER})/bus gsettings get org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type | grep -q nothing'
+t "no dead hooks in /etc"             '[ ! -d /etc/systemd/system-sleep ]'
+t "that setting is locked"            '[ -f /etc/dconf/db/local.d/locks/macbook-sleep ]'
+EOF
+sudo chmod +x /usr/local/sbin/sleep-check
+
+sudo tee /usr/local/bin/sleep-power &gt;/dev/null &lt;&lt;'EOF'
+#!/bin/bash
+# Reports battery drain for every sleep longer than 10 minutes, on battery only.
+# Source: /var/log/macbook-sleep-battery.log written by the 99-battery-log hook.
+# Accepts both the current field names and the older ones.
+LOG=/var/log/macbook-sleep-battery.log
+FULL=$(cat /sys/class/power_supply/BAT0/energy_full 2&gt;/dev/null || cat /sys/class/power_supply/BAT0/charge_full 2&gt;/dev/null)
+printf "%-20s %10s %12s\n" "SLEEP STARTED" "LENGTH" "DRAIN"
+while read -r d tm phase rest; do
+  e=$(echo "$rest" | grep -oE '(energy|energia)=[0-9]+' | cut -d= -f2)
+  a=$(echo "$rest" | grep -oE '(ac|zasilacz)=[^ ]+' | cut -d= -f2)
+  [ -z "$e" ] &amp;&amp; continue
+  if [ "$phase" = "pre" ]; then
+    pre_ts=$(date -d "$d $tm" +%s); pre_e=$e; pre_a=$a; pre_h="$d $tm"
+  elif [ "$phase" = "post" ] &amp;&amp; [ -n "$pre_ts" ]; then
+    ts=$(date -d "$d $tm" +%s); dt=$((ts-pre_ts)); pre_ts=""
+    [ "$dt" -lt 600 ] &amp;&amp; continue
+    if [ "$pre_a" != "0" ] || [ "$a" != "0" ]; then
+      printf "%-20s %6d min %12s\n" "$pre_h" $((dt/60)) "on AC"; continue
+    fi
+    pct=$(awk -v x=$((pre_e-e)) -v f=$FULL -v s=$dt 'BEGIN{ if(f&gt;0) printf "%.2f %%/h", (x/f)*100/(s/3600); else print "?" }')
+    printf "%-20s %6d min %12s\n" "$pre_h" $((dt/60)) "$pct"
+  fi
+done &lt; "$LOG"
+EOF
+sudo chmod +x /usr/local/bin/sleep-power</pre></div>
+        <p style="margin-top:12px;font-size:16px">Skrypt <code>sleep-probe</code> jest w sekcji o diagnostyce niżej. Wywołania: <code>sudo sleep-check</code>, <code>sleep-power</code> (bez roota), <code>sudo sleep-probe</code>.</p>
+      </div></li>
+
+      <li><div>
+        <h4>Automatyczna kontrola po aktualizacjach</h4>
+        <p>Skrypty usypiania leżą w katalogu pakietowym, a ich awaria jest bezgłośna. Ten haczyk sprawia, że po każdej operacji na pakietach stan konfiguracji sam się zapisuje do osobnego dziennika. Niczego nie zmienia i nie potrafi przerwać pracy <code>apt</code>.</p>
+        <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo tee /etc/apt/apt.conf.d/99-macbook-sleep-check &gt;/dev/null &lt;&lt;'EOF'
+// After every package operation, record the state of the sleep configuration.
+// Read-only: it reports, it never changes anything. Never fails the apt run.
+// Log: /var/log/macbook-sleep-check.log
+DPkg::Post-Invoke { "{ echo; date '+=== %F %T ==='; SUDO_USER=$(loginctl list-users --no-legend | awk '$1&gt;=1000{print $2; exit}') /usr/local/sbin/sleep-check; } &gt;&gt; /var/log/macbook-sleep-check.log 2&gt;&amp;1 || true"; };
+EOF
+apt-config dump | grep -i post-invoke</pre></div>
+        <p class="note" style="margin-top:14px">Podstawienie <code>SUDO_USER</code> jest konieczne, bo jedna z kontroli zagląda do ustawień pulpitu, a <code>apt</code> pracuje bez niczyjej sesji. <code>loginctl</code> wskazuje zalogowanego użytkownika po numerze konta.</p>
+      </div></li>
+
+      <li><div>
+        <h4>Restart</h4>
+        <p>Parametry jądra oraz ustawienia klapy i bezczynności wchodzą dopiero po ponownym uruchomieniu. Po zalogowaniu: <code>sudo sleep-check</code> — wszystkie osiemnaście pozycji powinno pokazać <code>OK</code>. Potem koniecznie test uśpienia z sekcji „Weryfikacja” — sama lista pozycji nie dowodzi, że skrypty się uruchamiają.</p>
+      </div></li>
+    </ol>
+  </section>
+
+  <section id="weryfikacja">
+    <h2>Weryfikacja</h2>
+    <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo sleep-check</pre></div>
+
+    <p style="margin-top:14px;font-size:16px"><code>sleep-check</code> sprawdza, czy pliki leżą na swoich miejscach — nie sprawdza, czy naprawdę się uruchamiają. Dlatego poniższy test uśpienia jest <strong>obowiązkowy</strong>, nie dodatkowy.</p>
+
+    <p style="margin-top:22px">Test uśpienia — <strong>musi iść przez systemd</strong>, bo <code>rtcwake</code> omija skrypty z <code>system-sleep</code> i nie sprawdzi poprawki B:</p>
+    <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo rtcwake -m no -s 60
+sudo systemctl suspend -i
+# po powrocie:
+sudo tail -2 /var/log/macbook-sleep-wifi.log</pre></div>
+    <p style="margin-top:10px;font-size:16px">Muszą pojawić się <strong>dwa świeże wpisy</strong>, z godziną sprzed chwili:</p>
+    <div class="cmd"><pre>2026-09-20 16:33:20 pre: driver unloaded (attempt 1)
+2026-09-20 16:34:24 post: driver loaded</pre></div>
+    <p style="margin-top:10px;font-size:16px">Brak świeżych wpisów oznacza, że skrypt nie jest uruchamiany — najczęściej dlatego, że leży w złym katalogu. Uśpienie może wtedy wyglądać na sprawne przez wiele cykli i zawieść dopiero w momencie zapisu obrazu hibernacji.</p>
+
+    <p style="margin-top:22px">Test bezczynności — zostaw komputer z otwartą klapą na pół godziny. Ekran ma zgasnąć po pięciu minutach i zażądać hasła, a maszyna ma <strong>pracować dalej</strong>: żadnego uśpienia, żadnej hibernacji. Gdyby mimo to zasnęła, decyzję przejął GNOME — sprawdź pierwszą komendę z kroku o bezczynności.</p>
+
+    <p style="margin-top:22px">Test hibernacji — obserwacyjny. Komputer musi <strong>zgasnąć całkowicie</strong> i czekać na przycisk zasilania. Logo Apple przy włączaniu potwierdza, że naprawdę był wyłączony, a odtworzone okna — że obraz się wczytał:</p>
+    <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo systemctl hibernate</pre></div>
+  </section>
+
+  <section id="utrzymanie">
+    <h2>Utrzymanie po aktualizacjach</h2>
+    <p>Kontrola robi się sama: haczyk <code>apt</code> uruchamia <code>sleep-check</code> po każdej operacji na pakietach i zapisuje wynik do <code>/var/log/macbook-sleep-check.log</code>. Zaglądaj tam po większych aktualizacjach albo gdy coś zacznie się dziwnie zachowywać: <code>sudo tail -20 /var/log/macbook-sleep-check.log</code>. Ręcznie, w dowolnej chwili: <code>sudo sleep-check</code>.</p><div class="note warn" style="margin:18px 0"><p style="margin-bottom:10px"><strong>Na tej maszynie jądro jest celowo zatrzymane.</strong> Powód nie ma nic wspólnego z uśpieniem: dźwięk działa dzięki modułowi <code>snd_hda_macbookpro</code>, budowanemu przez DKMS pod konkretne jądro. Wstrzymane są trzy pakiety:</p>
+<p style="margin-bottom:10px"><code>linux-generic-hwe-24.04</code>, <code>linux-headers-generic-hwe-24.04</code>, <code>linux-image-generic-hwe-24.04</code> — lista do sprawdzenia przez <code>apt-mark showhold</code>.</p>
+<p style="margin-bottom:10px">Dla tej konfiguracji to raczej dobrze: parametry jądra, położenie obrazu hibernacji i zachowanie sterowników zostają takie, jakie zmierzyliśmy. Cena jest inna i trzeba ją znać — <strong>łatki bezpieczeństwa jądra także nie przychodzą</strong>. To świadomy kompromis właściciela maszyny, nie stan domyślny.</p>
+<p style="margin-bottom:0">Gdyby blokada kiedyś została zdjęta, po starcie na nowym jądrze: sprawdź <code>dkms status</code> (moduł dźwięku musi się przebudować), uruchom <code>sudo sleep-check</code> i powtórz test uśpienia. Sam plik wymiany się nie zmienia, więc <code>resume_offset</code> zostaje ten sam.</p></div>
+<p>Czego ta kontrola <strong>nie</strong> potrafi: sprawdzić, czy skrypty usypiania naprawdę się uruchamiają. Tego dowodzi wyłącznie minutowy test uśpienia z sekcji „Weryfikacja” — po większej aktualizacji systemd warto go powtórzyć.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Element</th><th>Ryzyko przy aktualizacji</th></tr></thead>
+        <tbody>
+          <tr><td>Parametry jądra w <code>/etc/default/grub.d/</code></td><td><span class="ok">Brak.</span> Instalacja nowego jądra sama uruchamia przebudowę i je zachowuje.</td></tr>
+          <tr><td>Pliki w <code>/etc/systemd/</code> i <code>/etc/initramfs-tools/</code></td><td><span class="ok">Brak.</span> To katalogi administratora, pakiety ich nie nadpisują.</td></tr>
+          <tr><td>Skrypty w <code>/usr/local/</code> i usługi w <code>/etc/systemd/system/</code></td><td><span class="ok">Brak.</span> Poza zasięgiem menedżera pakietów.</td></tr>
+          <tr><td>Skrypty usypiania w <code>/usr/lib/systemd/system-sleep/</code></td><td><strong>Jedyne wrażliwe miejsce.</strong> To katalog pakietowy, a wariantu w <code>/etc</code> systemd tu nie obsługuje. Pakiety nie kasują obcych nazw plików, ale po większej aktualizacji systemd powtórz test uśpienia — awaria tych skryptów jest całkowicie bezgłośna.</td></tr>
+          <tr><td><code>resume_offset</code> a plik wymiany</td><td><strong>Ciche ryzyko.</strong> Jeśli <code>/swap.img</code> zostanie odtworzony albo przesunięty, hibernacja przestanie wracać bez żadnego ostrzeżenia. <code>sleep-check</code> to wykrywa; naprawa to powtórzenie kroku 2.</td></tr>
+          <tr><td>Secure Boot</td><td><strong>Blokuje hibernację.</strong> Włączenie go przełącza jądro w tryb ograniczony i zapis obrazu przestaje być możliwy. Sprawdzenie: <code>cat /sys/kernel/security/lockdown</code> musi pokazywać <code>[none]</code>.</td></tr>
+          <tr><td>Nazwa interfejsu <code>wlp2s0</code></td><td>Mało prawdopodobne, ale gdyby się zmieniła, trzeba ją poprawić w <code>50-wifi-reset</code> i <code>wifi-recover</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note warn" style="margin-top:20px">
+      <p><strong>Po aktualizacji wydania Ubuntu</strong> (np. 24.04 → 26.04) sprawdź nie tylko obecność plików, ale też zachowanie: jedno uśpienie i jedną hibernację. Nowe jądro może naprawić którąś z tych usterek — wtedy odpowiednia poprawka staje się zbędna — albo wprowadzić nową.</p>
+    </div>
+  </section>
+
+  <section id="diagnostyka">
+    <h2>Diagnostyka przy nawrocie</h2>
+    <p>Pierwsze pytanie zawsze brzmi: czy maszyna <em>nie zasypia</em>, czy <em>nie wraca</em>. Te dwie awarie wyglądają podobnie, a leczy się je zupełnie inaczej. Skrypt <code>sleep-probe</code> odpowiada na nie jednym przebiegiem.</p>
+    <div class="note" style="margin-bottom:18px">
+      <p style="margin-bottom:10px"><strong>Zanim sięgniesz po <code>sleep-probe</code>, zajrzyj do dziennika skryptu Wi-Fi.</strong> To najtańsze pytanie i odpowiada na najczęstszą przyczynę:</p>
+      <p style="margin-bottom:10px"><code>sudo tail -4 /var/log/macbook-sleep-wifi.log</code></p>
+      <p style="margin-bottom:0">Brak wpisów z ostatnich uśpień oznacza, że poprawka B nie działa, choć wszystko inne wygląda poprawnie. Objawy bywają wtedy mylące i odroczone w czasie: kilka uśpień przechodzi bez zarzutu, aż trafi się wybudzenie, po którym nie wraca kontroler USB — a jeśli akurat wtedy wypada hibernacja, obraz zapisuje się z zawieszonym sprzętem w środku i przy starcie nie daje się wczytać. Objawem jest czarny ekran po pasku ładowania i świeży start z propozycją trybu awaryjnego.</p>
+    </div>
+    <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo tee /usr/local/sbin/sleep-probe &gt;/dev/null &lt;&lt;'EOF'
+#!/bin/bash
+# Diagnostic run: suspends for 60 s, then reports how long it actually slept,
+# whether the disk survived, and which interrupts and ACPI events fired.
+# Use this when sleep starts misbehaving again.
+#
+# NOTE: rtcwake writes straight to the kernel and BYPASSES systemd, so the
+# hooks in /usr/lib/systemd/system-sleep are NOT run by this test. To exercise
+# those, use:  rtcwake -m no -s 60 &amp;&amp; systemctl suspend -i
+cp /proc/interrupts /dev/shm/irq_before
+grep -H . /sys/firmware/acpi/interrupts/* &gt; /dev/shm/gpe_before 2&gt;/dev/null
+T0=$(date +%s)
+rtcwake -m mem -s 60
+T1=$(date +%s)
+sleep 3
+cp /proc/interrupts /dev/shm/irq_after
+grep -H . /sys/firmware/acpi/interrupts/* &gt; /dev/shm/gpe_after 2&gt;/dev/null
+echo "=== SLEPT: $((T1-T0)) s (expected 60) ==="
+if dd if=/dev/nvme0n1 of=/dev/null bs=4k count=1 iflag=direct 2&gt;/dev/null; then
+  echo "=== DISK: OK ==="
+else
+  echo "=== DISK: GONE ==="
+fi
+echo "=== INTERRUPT DELTAS ==="
+awk 'NR==FNR{s=0;for(i=2;i&lt;=NF;i++) if($i+0==$i) s+=$i; a[$1]=s; next} {s=0;n="";for(i=2;i&lt;=NF;i++){if($i+0==$i) s+=$i; else n=n" "$i} d=s-a[$1]; if(d&gt;0) printf "%-8s +%-8d%s\n",$1,d,n}' /dev/shm/irq_before /dev/shm/irq_after
+echo "=== ACPI EVENT DELTAS ==="
+awk -F: 'NR==FNR{split($2,f," "); a[$1]=f[1]; next} {split($2,f," "); d=f[1]-a[$1]; if(d&gt;0) print $1, "+"d}' /dev/shm/gpe_before /dev/shm/gpe_after
+echo "=== SUSPEND ERRORS ==="
+dmesg | grep -iE 'failed to suspend|aborted|Identify Controller|I/O error|enter_D3' | tail -10
+rm -f /dev/shm/irq_before /dev/shm/irq_after /dev/shm/gpe_before /dev/shm/gpe_after
+EOF
+sudo chmod +x /usr/local/sbin/sleep-probe</pre></div>
+
+    <h3 style="margin-top:28px;font-size:17px">Jak czytać wynik</h3>
+    <ul class="plain">
+      <li><code>failed to suspend async</code> <strong>zawsze podaje nazwę winnego sterownika</strong> — to najcenniejszy wzorzec w całym tym zestawie. Ten sam schemat skryptu zadziała dla dowolnego innego urządzenia, także na zupełnie innym laptopie.</li>
+      <li><code>Identify Controller failed</code> lub lawina <code>I/O error</code> → awaria typu A. Sprawdź, czy <code>pcie_port_pm=off</code> jest w <code>/proc/cmdline</code>.</li>
+      <li>Pełne 60 sekund snu i cisza → sprzęt sprawny, szukaj w blokadach uśpienia: <code>systemd-inhibit --list</code>.</li>
+      <li>Komputer włącza się sam ze stanu wyłączenia → sprawdź <code>/proc/acpi/wakeup</code>; w logach systemu nic nie będzie, bo system wtedy nie działał.</li>
+    </ul>
+    <div class="note warn" style="margin-top:20px">
+      <p>Testy awarii typu A rób <strong>z konsoli tekstowej</strong> (<code>sudo chvt 3</code>). Gdy dysk odpada, do dziennika nie trafi już nic — komunikaty jądra istnieją wyłącznie na ekranie. Warto też przygotować skrypty <em>przed</em> testem: po utracie sieci nie ma jak przekleić poleceń z drugiego urządzenia.</p>
+    </div>
+  </section>
+
+  <section id="wycofanie">
+    <h2>Wycofanie</h2>
+    <div class="cmd"><button class="btn" type="button">Kopiuj</button><pre>sudo systemctl disable --now disable-wake-sources.service wifi-recover.timer
+sudo rm -f /etc/default/grub.d/99-macbook-suspend.cfg \
+           /etc/initramfs-tools/conf.d/resume \
+           /usr/lib/systemd/system-sleep/50-wifi-reset \
+           /usr/lib/systemd/system-sleep/99-battery-log \
+           /etc/systemd/sleep.conf.d/99-hibernate.conf \
+           /etc/systemd/logind.conf.d/99-lid.conf \
+           /etc/systemd/logind.conf.d/99-idle.conf \
+           /etc/apt/apt.conf.d/99-macbook-sleep-check \
+           /etc/dconf/db/local.d/00-macbook-sleep \
+           /etc/dconf/db/local.d/locks/macbook-sleep \
+           /etc/systemd/system/disable-wake-sources.service \
+           /etc/systemd/system/wifi-recover.service \
+           /etc/systemd/system/wifi-recover.timer \
+           /usr/local/sbin/disable-wake-sources /usr/local/sbin/wifi-recover \
+           /usr/local/sbin/sleep-check /usr/local/sbin/sleep-probe \
+           /usr/local/bin/sleep-power
+sudo systemctl daemon-reload
+sudo update-initramfs -u -k all
+sudo update-grub &amp;&amp; sudo reboot</pre></div>
+    <p>Po usunięciu plików <code>dconf</code> trzeba jeszcze przebudować bazę: <code>sudo dconf update</code>. Dopiero wtedy suwak uśpienia w ustawieniach GNOME znów da się ruszyć. Plik <code>/etc/dconf/profile/user</code> zostawiamy — jest nieszkodliwy i mogą z niego korzystać inne ustawienia systemowe.</p>
+    <p>Oryginalny <code>/etc/default/grub</code> nie jest w ogóle modyfikowany — wszystkie zmiany żyją w osobnych plikach. Plik wymiany zostaje powiększony; jeśli chcesz go zmniejszyć, powtórz krok pierwszy z mniejszym rozmiarem.</p>
+  </section>
+
+  <section id="odrzucone">
+    <h2>Sprawdzone i odrzucone</h2>
+    <p>Poniższe nie pomogły w tym przypadku. Zapisane, żeby nikt nie tracił na nie czasu drugi raz.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Trop</th><th>Dlaczego odpadł</th></tr></thead>
+        <tbody>
+          <tr><td><code>mem_sleep_default=deep</code></td><td>Zabija jądro przy wybudzaniu tak skutecznie, że nie zdąża zapisać ani jednej linii w dzienniku.</td></tr>
+          <tr><td><code>nvme_core.default_ps_max_latency_us=0</code></td><td>Zarządzanie stanami energetycznymi dysku nie było przyczyną; parametr sam z siebie nic nie zmienił.</td></tr>
+          <tr><td><code>intel_iommu=off</code></td><td>Bez wpływu, a osłabia ochronę przed atakami DMA przez Thunderbolt.</td></tr>
+          <tr><td><code>pcie_aspm=off</code></td><td>Zbędny obok <code>pcie_port_pm=off</code>, a kosztuje czas pracy na baterii.</td></tr>
+          <tr><td><code>acpi.ec_no_wakeup=Y</code></td><td>Kontroler wbudowany nie budził maszyny; jego zdarzenia tylko towarzyszyły nieudanym próbom.</td></tr>
+          <tr><td><code>rfkill block wifi</code> / <code>ip link down</code></td><td>Gasi radio, ale sterownik i tak negocjuje z zawieszonym firmware. Konieczne jest wyjęcie modułu.</td></tr>
+          <tr><td>Uśpienie wywołane bezczynnością (<code>IdleAction=suspend</code> i <code>suspend-then-hibernate</code>)</td><td>Kusząca wygoda, ale to właśnie uśpienie z bezczynności zawiesiło maszynę, podczas gdy uśpienia z klapy tego samego dnia przechodziły bez zarzutu. Usypianie zostało przy jednym, świadomym geście.</td></tr>
+          <tr><td>Reguła <code>udev</code> zamiast usługi (<code>ATTR{power/wakeup}="disabled"</code>)</td><td>Kusząca, bo deklaratywna i odporna na aktualizacje. Działa na kartę Wi-Fi, bo ta siedzi na PCI — ale na klapę (<code>platform:PNP0C0D:00</code>) nie działa wcale. Zamiast jednego mechanizmu wychodziły dwa, więc odpadła.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:20px"><strong>Szum w logach, nie usterki:</strong> ostrzeżenia <code>tb_cfg_write</code> ze sterownika Thunderbolt przy każdym wybudzeniu, <code>xhci_hcd 0000:07:00.0: HC died</code> (porty USB-C mimo to działają), oraz błędy ACPI dotyczące opisu procesorów przy starcie.</p>
+  </section>
+
+  <section id="niewiadome">
+    <h2>Czego nie wiemy</h2>
+    <ul class="plain">
+      <li>Sprawdzone na jednej maszynie, jednym jądrze i jednej wersji Ubuntu.</li>
+      <li>Nie wiadomo, czy <code>pcie_port_pm=off</code> wystarcza na innych modelach MacBooka — mają inne kontrolery i inny układ portów.</li>
+      <li>Nie wiadomo, co zawiesza firmware karty Wi-Fi. Główny podejrzany to brakujące pliki kalibracyjne <code>brcmfmac4350c2-pcie.txt</code>, <code>clm_blob</code> i <code>txcap_blob</code>, których w systemie nie ma. Ich uzupełnienie mogłoby usunąć przyczynę i pozwolić skasować poprawki B i E.</li>
+      <li>Nie wiadomo, co blokuje wejście platformy w stan S0ix. Gdyby się to udało, hibernacja przestałaby być potrzebna.</li>
+      <li><strong>Uśpienie zawodzi losowo, mniej więcej raz na pięć razy.</strong> Maszyna wchodzi w uśpienie czysto — skrypt Wi-Fi robi swoje, synchronizacja plików się kończy — i już nie wraca. W dzienniku nie ma po tym śladu, bo wszystko, co jądro zapisuje w trakcie, ginie razem z niewybudzoną maszyną. Nie wiadomo, czy zawodzi zasypianie, czy budzenie, ani które urządzenie za to odpowiada. Pierwszy krok przy następnym wystąpieniu: nacisnąć Caps Lock i sprawdzić diodę — jeśli reaguje, jądro żyje i winna jest grafika; jeśli nie, maszyna jest martwa naprawdę. Dalszy krok to uruchomienie systemu bez <code>quiet splash</code>, z <code>no_console_suspend=1</code> i <code>initcall_debug</code>, i sfotografowanie ekranu przy kolejnym zawieszeniu.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Konfiguracja sprawdzona 16–21 września 2026, zużycie zmierzone na pełnych nocach, hibernacja potwierdzona po przeniesieniu skryptów na właściwą ścieżkę. Treść wszystkich szesnastu plików porównana znak po znaku z działającą maszyną — to, co tu przeczytasz, jest tym, co na niej leży. Ten dokument zawiera komplet — po jego wykonaniu na czystym systemie konfiguracja odtwarza się w całości, bez żadnych plików w katalogu domowym.
+  </footer>
+
+</div>
+
+<script>
+  document.querySelectorAll('.cmd .btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var text = b.parentElement.querySelector('pre').textContent;
+      var done = function () {
+        var old = b.textContent;
+        b.textContent = 'Skopiowane';
+        setTimeout(function () { b.textContent = old; }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () {});
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+</script>
