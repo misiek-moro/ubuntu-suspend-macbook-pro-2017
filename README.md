@@ -136,6 +136,30 @@ because they carry the root filesystem UUID and the swap file's physical offset.
 Polish**: how each fault was found, the measurements, the dead ends, the
 rollback procedure, and what is still unknown. Open it in a browser.
 
+## How this was made
+
+Ten days of paired work between the repository owner and Claude, Anthropic's
+assistant: the assistant wrote the commands and the prose, the owner ran
+everything on the machine and made the calls about what to keep. Every number
+above is a measurement from that one laptop — none of them are estimates.
+
+How it got there matters, because it tells you how far to trust it:
+
+- Most of the assistant's early hypotheses were wrong. Deep sleep (S3), Wi-Fi
+  DMA, NVMe power states, EC wakeup storms and a udev rule were all proposed
+  confidently and all bisected away against data from the machine.
+- The assistant introduced two defects of its own. One put the sleep hooks in
+  `/etc/systemd/system-sleep/`, where systemd never looks, which cost a failed
+  hibernation days later; the other wrote files without their final newline.
+  Both were caught by comparing the documentation against the running system,
+  file by file — which is why `verify.sh` exists.
+- Everything here is verified on one machine, one kernel, one Ubuntu release.
+
+Someone will likely do this better. Corrections, issues and pull requests are
+welcome — particularly from anyone with the same laptop whose machine behaves
+differently, and from anyone who knows what actually blocks S0ix here or where
+the missing Broadcom calibration files come from.
+
 ## License
 
 MIT — see [LICENSE](LICENSE). Configuration files carry no warranty; this one
