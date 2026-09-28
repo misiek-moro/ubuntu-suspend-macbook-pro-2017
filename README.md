@@ -132,7 +132,7 @@ because they carry the root filesystem UUID and the swap file's physical offset.
 
 ## The long version
 
-[`docs/diagnosis-pl.html`](docs/diagnosis-pl.html) is the full write-up **in
+[The full write-up (in Polish)](https://misiek-moro.github.io/ubuntu-suspend-macbook-pro-2017/diagnosis-pl.html) is the full write-up **in
 Polish**: how each fault was found, the measurements, the dead ends, the
 rollback procedure, and what is still unknown. Open it in a browser.
 
